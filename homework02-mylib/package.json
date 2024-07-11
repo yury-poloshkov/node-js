@@ -1,0 +1,16 @@
+{
+    "name": "yp-password-generator",
+    "version": "1.0.0",
+    "main": "passgen.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "password",
+        "passgen",
+        "generator"
+    ],
+    "author": "Yury Poloshkov, 1286600@gmail.com",
+    "license": "ISC",
+    "description": "Generates random passwords of different strength"
+}
