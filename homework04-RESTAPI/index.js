@@ -2,24 +2,11 @@ const express = require('express');
 const joi = require('joi');
 const fs = require('fs');
 const path = require('path');
+const e = require('express');
 
 const app = express();
 let uniqueID = 0;
-
-const users = [
-    // {
-    //     firstName: 'Ivan',
-    //     secondName: 'Ivanov',
-    //     age: 35,
-    //     city: 'Moscow'
-    // },
-    // {
-    //     firstName: 'Petr',
-    //     secondName: 'Petrov',
-    //     age: 45,
-    //     city: 'Tagil'
-    // }
-];
+const dataBasePath = path.join(__dirname, './database/users.json');
 
 const userSchema = joi.object({
     firstName: joi.string().min(1).required(),
@@ -28,15 +15,32 @@ const userSchema = joi.object({
     city: joi.string().min(1).required()
 });
 
+app.use((req, res, next) => {
+    try {
+        const users = JSON.parse(fs.readFileSync(dataBasePath));
+    } catch (err) {
+        console.log("Initializing database!");
+        fs.writeFileSync(dataBasePath, JSON.stringify({ 0: {} }, null, 2));
+    }
+    next();
+});
+
 app.use(express.json());
 
 app.get('/users', (req, res) => {
-    res.send({ users });
+    const users = JSON.parse(fs.readFileSync(dataBasePath));
+    if (users) {
+        res.send({ users });
+    } else {
+        res.status(404);
+        res.send({ user: null });
+    }
 });
 
 app.get('/users/:id', (req, res) => {
+    const users = JSON.parse(fs.readFileSync(dataBasePath));
     const userID = +req.params.id;
-    const user = users.find(user => user.id === userID);
+    const user = users[userID];
 
     if (user) {
         res.send({ user });
@@ -52,12 +56,15 @@ app.post('/users', (req, res) => {
         return res.status(404).send({ error: result.error.details });
     }
 
-    uniqueID += 1;
-    users.push({
-        id: uniqueID,
-        ...req.body
-    })
+    const users = JSON.parse(fs.readFileSync(dataBasePath));
+    for (const key of Object.keys(users)) {
+        if (uniqueID < +key) uniqueID = +key;
+
+    }
+    users[++uniqueID] = req.body;
+    fs.writeFileSync(dataBasePath, JSON.stringify(users, null, 2));
     res.send({ id: uniqueID });
+    // res.send({ users });
 });
 
 app.put('/users/:id', (req, res) => {
@@ -66,14 +73,16 @@ app.put('/users/:id', (req, res) => {
         return res.status(404).send({ error: result.error.details });
     }
 
+    const users = JSON.parse(fs.readFileSync(dataBasePath));
     const userID = +req.params.id;
-    const user = users.find(user => user.id === userID);
+    const user = users[userID];
 
     if (user) {
         user.firstName = req.body.firstName;
         user.secondName = req.body.secondName;
         user.age = req.body.age;
         user.city = req.body.city;
+        fs.writeFileSync(dataBasePath, JSON.stringify(users, null, 2));
         res.send({ user });
     } else {
         res.status(404);
@@ -84,10 +93,12 @@ app.put('/users/:id', (req, res) => {
 
 app.delete('/users/:id', (req, res) => {
     const userID = +req.params.id;
-    const user = users.find(user => user.id === userID);
+    const users = JSON.parse(fs.readFileSync(dataBasePath));
+    const user = users[userID];
 
     if (user) {
-        users.splice(users.indexOf(user), 1);
+        delete users[userID];
+        fs.writeFileSync(dataBasePath, JSON.stringify(users, null, 2));
         res.send({ user });
     } else {
         res.status(404);
@@ -95,6 +106,6 @@ app.delete('/users/:id', (req, res) => {
     };
 });
 
-const port = 30001;
+const port = 40000;
 
 app.listen(port);

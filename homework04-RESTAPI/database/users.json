@@ -1,0 +1,27 @@
+{
+  "0": {},
+  "1": {
+    "firstName": "Yury1213156",
+    "secondName": "Poloshkov",
+    "age": 45,
+    "city": "Moscow"
+  },
+  "3": {
+    "firstName": "Yury9999",
+    "secondName": "Poloshkov",
+    "age": 35,
+    "city": "Krasnoyarsk"
+  },
+  "4": {
+    "firstName": "Yury1213156",
+    "secondName": "Poloshkov",
+    "age": 45,
+    "city": "Moscow"
+  },
+  "5": {
+    "firstName": "Yury12",
+    "secondName": "Poloshkov",
+    "age": 25,
+    "city": "Moscow"
+  }
+}
