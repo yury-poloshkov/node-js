@@ -1,4 +1,7 @@
 const express = require('express');
+const joi = require('joi');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 let uniqueID = 0;
@@ -18,10 +21,29 @@ const users = [
     // }
 ];
 
-app.use(express.json())
+const userSchema = joi.object({
+    firstName: joi.string().min(1).required(),
+    secondName: joi.string().min(1).required(),
+    age: joi.number().min(0).max(150),
+    city: joi.string().min(1).required()
+});
+
+app.use(express.json());
 
 app.get('/users', (req, res) => {
     res.send({ users });
+});
+
+app.get('/users/:id', (req, res) => {
+    const userID = +req.params.id;
+    const user = users.find(user => user.id === userID);
+
+    if (user) {
+        res.send({ user });
+    } else {
+        res.status(404);
+        res.send({ user: null });
+    }
 });
 
 app.post('/users', (req, res) => {
@@ -31,7 +53,7 @@ app.post('/users', (req, res) => {
         ...req.body
     })
     res.send({ id: uniqueID });
-})
+});
 
 app.put('/users/:id', (req, res) => {
     const userID = +req.params.id;
@@ -50,6 +72,19 @@ app.put('/users/:id', (req, res) => {
 
 });
 
-const port = 30000;
+app.delete('/users/:id', (req, res) => {
+    const userID = +req.params.id;
+    const user = users.find(user => user.id === userID);
 
-app.listen(port)
+    if (user) {
+        users.splice(users.indexOf(user), 1);
+        res.send({ user });
+    } else {
+        res.status(404);
+        res.send({ user: null });
+    };
+});
+
+const port = 30001;
+
+app.listen(port);
