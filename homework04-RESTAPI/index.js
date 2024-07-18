@@ -24,7 +24,7 @@ const users = [
 const userSchema = joi.object({
     firstName: joi.string().min(1).required(),
     secondName: joi.string().min(1).required(),
-    age: joi.number().min(0).max(150),
+    age: joi.number().min(0).max(150).required(),
     city: joi.string().min(1).required()
 });
 
@@ -47,6 +47,11 @@ app.get('/users/:id', (req, res) => {
 });
 
 app.post('/users', (req, res) => {
+    const result = userSchema.validate(req.body);
+    if (result.error) {
+        return res.status(404).send({ error: result.error.details });
+    }
+
     uniqueID += 1;
     users.push({
         id: uniqueID,
@@ -56,6 +61,11 @@ app.post('/users', (req, res) => {
 });
 
 app.put('/users/:id', (req, res) => {
+    const result = userSchema.validate(req.body);
+    if (result.error) {
+        return res.status(404).send({ error: result.error.details });
+    }
+
     const userID = +req.params.id;
     const user = users.find(user => user.id === userID);
 
