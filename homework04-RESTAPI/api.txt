@@ -1,0 +1,34 @@
+endpoints
+
+/**
+ * GET all users
+ */
+
+get /users
+
+
+/**
+ * GET user
+ */
+
+get /users/:id
+
+/**
+ * CREATE user
+ */
+
+post /users
+
+/**
+ * UPDATE user
+ */
+
+put /users /:id
+
+/**
+ * DELETE user
+ */
+
+delete /users/:id
+
+
